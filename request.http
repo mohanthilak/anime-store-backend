@@ -1,0 +1,30 @@
+# "uid": "6400bf7454b7d3930f7a3da9",
+# "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRyaWFsQHRyaWFsLmNvbSIsInJvbGUiOiJ1c2VyIiwidWlkIjoiNjQwMGJmNzQ1NGI3ZDM5MzBmN2EzZGE5IiwiaWF0IjoxNjc3Nzc0NjAzfQ._sg3mkQ6jvbHyGF-JnO0hBBFZBaI3-F8tWx8RQeAno0",
+# "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRyaWFsQHRyaWFsLmNvbSIsInJvbGUiOiJ1c2VyIiwidWlkIjoiNjQwMGJmNzQ1NGI3ZDM5MzBmN2EzZGE5IiwiaWF0IjoxNjc3Nzc0NjAzfQ.6haiYKhLvkfmGI8IgGwUBj7Cm-Qv6RGFRp4cIKGALTI"
+
+POST http://localhost:4000/user/signup
+Content-Type: application/json
+
+{
+    "email": "trial@trial.com",
+    "password": "nono"
+}
+###
+GET http://localhost:4000/user/refresh-token/6400bf7454b7d3930f7a3da9
+
+###
+POST http://localhost:4000/user/logout/6400bf7454b7d3930f7a3da9
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRyaWFsQHRyaWFsLmNvbSIsInVpZCI6IjY0MDBiZjc0NTRiN2QzOTMwZjdhM2RhOSIsImlhdCI6MTY3Nzc3MDYxMn0.7yP0WBDVVQHJU1qzYi1t4kqUqEgjt6frABOEkVK7rtE",
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRyaWFsQHRyaWFsLmNvbSIsInVpZCI6IjY0MDBiZjc0NTRiN2QzOTMwZjdhM2RhOSIsImlhdCI6MTY3Nzc3MDYxMn0.wG5-CTg0NpqLN2Q2Ic91PaKLyCT0R0VoJHyIIqBWxXQ"
+}
+###
+POST http://localhost:4000/user/signin
+Content-Type: application/json
+
+{
+    "email": "trial@trial.com",
+    "password": "nono"
+}
