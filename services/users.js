@@ -1,5 +1,5 @@
 const {hash, compare} = require('bcrypt')
-const {sign} = require('jsonwebtoken');
+const {sign, verify} = require('jsonwebtoken');
 const {ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET} = require("../config/EnvVars")
 
 class UserService {
@@ -17,8 +17,8 @@ class UserService {
             if(data.success){
                 const user = data.user;
                 const payload = {email, role: data.role, uid: data.data._id};
-                const accessToken = await sign(payload, ACCESS_TOKEN_SECRET);
-                const refreshToken = await sign(payload, REFRESH_TOKEN_SECRET);
+                const accessToken = await sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '15s' });
+                const refreshToken = await sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: '1m' });
                 this.userRepo.CreateRefreshToken(refreshToken, data.data._id);
                 return {success: true, uid: data.data._id, tokens: {accessToken, refreshToken}}
             }else{
@@ -38,10 +38,10 @@ class UserService {
             const validPassword = await compare(password, data.user.password);
             if(!validPassword) return {success: false, message: "Enter the correct email/password"};
             const payload = {email, role: data.user.role, uid: data.user._id};
-            const accessToken = await sign(payload, ACCESS_TOKEN_SECRET);
-            const refreshToken = await sign(payload, REFRESH_TOKEN_SECRET);
+            const accessToken = await sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: '15s' });
+            const refreshToken = await sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: '1m' });
             this.userRepo.CreateRefreshToken(refreshToken, data.user._id);
-            return {success: true, uid: data.user._id, tokens: {accessToken, refreshToken}}
+            return {success: true, user: data.user, accessToken, refreshToken}
         }catch(e){
             console.log("Error at user service layer", e);
             return {success: false, message: "server-error", error: e};
@@ -67,6 +67,27 @@ class UserService {
         }catch(e){
             console.log("Error at the user Service layer", e);
             return {success: false, message:e}
+        }
+    }
+
+    async RefreshAccessToken(refreshToken) {
+        try{
+            const data = await this.userRepo.FindRefreshTokenWithUserDetails(refreshToken);
+            if(data.success){
+                const payload = await verify(refreshToken, REFRESH_TOKEN_SECRET);
+                if(payload){
+                    if(payload.email !== data.refreshToken.user.email) return{success: false, message: "invalid user"}
+                    console.log(payload)
+                    //  payload = {payload.email, role: data.role, uid: data.data._id};
+                     const {email, role, uid} = payload
+                    const accessToken = sign({email, role, uid}, ACCESS_TOKEN_SECRET, {expiresIn: '15s'});
+                    return {success: true, accessToken,email, uid, role, }
+                }
+            }
+            return data;
+        }catch(e){
+            console.log("Error at the user Service layer", e);
+            return {success: false, error:e}
         }
     }
 }

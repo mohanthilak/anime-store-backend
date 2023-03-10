@@ -46,6 +46,45 @@ class UserRepository {
         }
     }
 
+    async FindRefreshTokenWithUserDetails(refreshToken) {
+        try{
+            const data = await refreshTokenModel.aggregate([
+                {
+                    $match: {refreshToken}
+                },
+                {
+                    $addFields: {"uid": {$toObjectId: "$user_id"}}
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        localField: "uid",
+                        foreignField: "_id",
+                        as: 'user'
+                    }
+                },
+                {
+                    $addFields: {'user' : {$first: '$user'}}
+                },
+                {
+                    $project: {
+                        uid: 0,
+                        'user.password': 0
+                    }
+                },
+                
+            ]);
+            console.log("data from aggregate function", data);
+            if(data) {
+                return {success: true, refreshToken: data[0]};
+            }
+            return {success: false, message: "Refresh Token Not found"}
+        }catch(e){
+            console.log("Error at user Repository layer", e);
+            return {success: false, error: e};
+        }
+    }
+
     async GetRefreshTokenWithUID(uid){
         try{
             const refreshToken = await refreshTokenModel.findOne({user_id: uid});

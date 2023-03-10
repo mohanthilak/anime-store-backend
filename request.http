@@ -28,3 +28,29 @@ Content-Type: application/json
     "email": "trial@trial.com",
     "password": "nono"
 }
+###
+
+GET http://localhost:4000/user/protected
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRyaWFsQHRyaWFsLmNvbSIsInJvbGUiOiJ1c2VyIiwidWlkIjoiNjQwMGJmNzQ1NGI3ZDM5MzBmN2EzZGE5IiwiaWF0IjoxNjc3Nzc0NjAzfQ._sg3mkQ6jvbHyGF-JnO0hBBFZBaI3-F8tWx8RQeAno0
+
+###
+POST http://localhost:4000/user/refresh
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Impvam9Aam9qby5jb20iLCJyb2xlIjoidXNlciIsInVpZCI6IjY0MDBkOWE2N2I4ZmM2MjlhOTZkYTE3NyIsImlhdCI6MTY3Nzk4NDEwM30.kMthvsPFri3OnpAPCU7eEZ7MfWnSw2JcRjUKUbZ3_b4"
+}
+###
+# {
+#   "_id": {
+#     "$oid": "64040167ba5519fc420cabe4"
+#   },
+#   "refreshToken": "",
+#   "user_id": "6400d9a67b8fc629a96da177",
+#   "createdAt": {
+#     "$date": {
+#       "$numberLong": "1677984103351"
+#     }
+#   },
+#   "__v": 0
+# }
