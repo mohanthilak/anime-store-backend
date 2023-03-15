@@ -111,6 +111,16 @@ class UserService {
       return { success: false, error: e };
     }
   }
+
+  async GetUsersCount() {
+    try {
+      const data = await this.userRepo.GetUsersCount();
+      return data;
+    } catch (e) {
+      console.log("Error while getting user count", e);
+      return { success: false, error: e };
+    }
+  }
 }
 
 module.exports = { UserService };

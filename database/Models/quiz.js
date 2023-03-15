@@ -28,6 +28,11 @@ const QuestionSchema = new Schema({
 });
 
 const quizSchema = new Schema({
+  AttemptCount: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
   animeName: {
     type: String,
     required: true,

@@ -23,6 +23,15 @@ class QuizRepository {
     }
   }
 
+  async GetAllQuiz() {
+    try {
+      const quiz = await quizModel.find({}).lean();
+      return { success: true, quiz };
+    } catch (e) {
+      console.log(ErrorStatement, e);
+      return { success: false, error: e };
+    }
+  }
   async EditAnimeDetails({ id, animeName, season, image }) {
     try {
       const quiz = await quizModel.findOneAndUpdate(
@@ -31,6 +40,30 @@ class QuizRepository {
       );
       console.log(quiz);
       return { success: true, message: "Success Updated" };
+    } catch (e) {
+      console.log(ErrorStatement, e);
+      return { success: false, error: e };
+    }
+  }
+
+  async UpdateQuizAttemptCount({ quizID }) {
+    try {
+      const quiz = await quizModel
+        .findOne({ _id: quizID })
+        .select({ password: 0 });
+      quiz.AttemptCount += 1;
+      await quiz.save();
+      return { success: true, quiz };
+    } catch (e) {
+      console.log(ErrorStatement, e);
+      return { success: false, message: e };
+    }
+  }
+
+  async GetQuizCount() {
+    try {
+      const count = await quizModel.count();
+      return { success: true, count };
     } catch (e) {
       console.log(ErrorStatement, e);
       return { success: false, error: e };

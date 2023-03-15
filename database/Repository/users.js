@@ -95,6 +95,43 @@ class UserRepository {
       return { success: false, message: e };
     }
   }
+
+  async UpdateAttemptedQuiz({ uid, quizID, score }) {
+    try {
+      const user = await userModel.findById(uid);
+      console.log(user);
+      let found = false;
+      user.attemptedQuiz.forEach((e, i) => {
+        if (e.quizID === quizID) {
+          user.attemptedQuiz[i].score = score;
+          found = true;
+          return;
+        }
+      });
+      if (!found) {
+        const attemptedQuiz = {
+          quizID: quizID,
+          score,
+        };
+        user.attemptedQuiz.push(attemptedQuiz);
+      }
+      await user.save();
+      return { success: true, user };
+    } catch (e) {
+      console.log("error at user respository layer:", e);
+      return { success: false, message: e };
+    }
+  }
+
+  async GetUsersCount() {
+    try {
+      const count = await userModel.count();
+      return { success: true, count };
+    } catch (e) {
+      console.log("Error while getting total user count", e);
+      return { success: false, error: e };
+    }
+  }
 }
 
 module.exports = { UserRepository };
