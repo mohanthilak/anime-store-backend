@@ -12,10 +12,14 @@ class UserService {
     this.userRepo = repo;
   }
 
-  async SignUp({ email, password }) {
+  async SignUp({ email, password, username }) {
     try {
       password = await hash(password, 10);
-      const data = await this.userRepo.CreateUser({ email, password });
+      const data = await this.userRepo.CreateUser({
+        email,
+        password,
+        username,
+      });
 
       if (data.success) {
         const user = data.user;
@@ -118,6 +122,16 @@ class UserService {
       return data;
     } catch (e) {
       console.log("Error while getting user count", e);
+      return { success: false, error: e };
+    }
+  }
+
+  async GetAllUsersPerformace() {
+    try {
+      const data = await this.userRepo.GetAllUsersPerformace();
+      return data;
+    } catch (e) {
+      console.log("Error while GetAllUsersPerformace", e);
       return { success: false, error: e };
     }
   }

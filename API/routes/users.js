@@ -20,8 +20,8 @@ const { trusted } = require("mongoose");
 
 router.post("/signup", async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const data = await userservice.SignUp({ email, password });
+    const { email, password, username } = req.body;
+    const data = await userservice.SignUp({ email, password, username });
     console.log("DATA:", data);
     if (data.success) {
       res.cookie("rt", data.tokens.refreshToken, {
@@ -129,6 +129,17 @@ router.get("/get-count-stats", async (req, res) => {
     return res.status(200).json(response);
   } catch (e) {
     console.log("Error while handling count stats", e);
+    return res.status(401).json({ success: false, error: e });
+  }
+});
+
+router.get("/quiz-performance", async (req, res) => {
+  try {
+    const data = await userservice.GetAllUsersPerformace();
+    if (data.success) return res.status(200).json(data);
+    return res.status(201).json(data);
+  } catch (e) {
+    console.log("Error while handling quiz-performance stats", e);
     return res.status(401).json({ success: false, error: e });
   }
 });

@@ -2,9 +2,9 @@ const userModel = require("../Models/users");
 const refreshTokenModel = require("../Models/refreshToken");
 
 class UserRepository {
-  async CreateUser({ email, password }) {
+  async CreateUser({ email, password, username }) {
     try {
-      const user = new userModel({ email, password });
+      const user = new userModel({ email, password, username });
       await user.save();
       return { success: true, data: user };
     } catch (e) {
@@ -104,6 +104,7 @@ class UserRepository {
       user.attemptedQuiz.forEach((e, i) => {
         if (e.quizID === quizID) {
           user.attemptedQuiz[i].score = score;
+          user.attemptedQuiz[i].attempts += 1;
           found = true;
           return;
         }
@@ -112,11 +113,39 @@ class UserRepository {
         const attemptedQuiz = {
           quizID: quizID,
           score,
+          attempts: 1,
         };
         user.attemptedQuiz.push(attemptedQuiz);
       }
       await user.save();
       return { success: true, user };
+    } catch (e) {
+      console.log("error at user respository layer:", e);
+      return { success: false, message: e };
+    }
+  }
+
+  async GetAllUsersPerformace() {
+    try {
+      const users = await userModel.aggregate([
+        { $match: {} },
+        {
+          $unwind: "$attemptedQuiz",
+        },
+        {
+          $addFields: { aid: { $toObjectId: "$attemptedQuiz.quizID" } },
+        },
+        {
+          $lookup: {
+            from: "quizzes",
+            localField: "aid",
+            foreignField: "_id",
+            as: "quizDetails",
+          },
+        },
+      ]);
+      console.log(users);
+      return { success: true, users };
     } catch (e) {
       console.log("error at user respository layer:", e);
       return { success: false, message: e };

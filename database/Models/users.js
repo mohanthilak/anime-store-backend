@@ -1,6 +1,10 @@
 const { Schema, model } = require("mongoose");
 
 const QuizAttemptSchema = new Schema({
+  attempts: {
+    type: Number,
+    required: true,
+  },
   quizID: {
     type: String,
     required: true,
@@ -13,6 +17,11 @@ const QuizAttemptSchema = new Schema({
 
 const userSchema = new Schema({
   attemptedQuiz: [QuizAttemptSchema],
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   email: {
     type: String,
     unique: true,
