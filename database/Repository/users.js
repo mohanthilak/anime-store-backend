@@ -4,12 +4,13 @@ const refreshTokenModel = require("../Models/refreshToken");
 class UserRepository {
   async CreateUser({ email, password, username }) {
     try {
-      const user = new userModel({ email, password, username });
+      const user = new userModel({ email, password, username, role: "admin" });
       await user.save();
       return { success: true, data: user };
     } catch (e) {
       console.log("Error at user repository:", e);
-      if (e.code) return { success: false, message: "email already exists" };
+      if (e.code)
+        return { success: false, message: "email/username already exists" };
       return { success: false, message: "server-error" };
     }
   }
@@ -28,7 +29,28 @@ class UserRepository {
       const user = await userModel.findOne({ email }).lean();
       console.log(user);
       if (user) return { success: true, user };
-      return { success: false, message: "Enter the correct email/password" };
+      return { success: false, message: "Enter the correct credentials" };
+    } catch (e) {
+      console.log("Error at user Repository layer", e);
+      return { success: false, message: "server-error", error: e };
+    }
+  }
+
+  async GetUserWithId(id) {
+    try {
+      const user = await userModel.findById(id).lean();
+      return { success: true, data: user };
+    } catch (e) {
+      console.log("Error at user Repository layer", e);
+      return { success: false, message: "server-error", error: e };
+    }
+  }
+
+  async GetUserWithUsername(username) {
+    try {
+      const user = await userModel.findOne({ username });
+      if (user) return { success: true, user };
+      return { success: false, message: "Enter the correct credentials" };
     } catch (e) {
       console.log("Error at user Repository layer", e);
       return { success: false, message: "server-error", error: e };
@@ -149,6 +171,16 @@ class UserRepository {
     } catch (e) {
       console.log("error at user respository layer:", e);
       return { success: false, message: e };
+    }
+  }
+
+  async GetAllUsers() {
+    try {
+      const users = await userModel.find({});
+      return { success: true, users };
+    } catch (e) {
+      console.log("error while run user Repositoy", e);
+      return { success: true, message: e };
     }
   }
 

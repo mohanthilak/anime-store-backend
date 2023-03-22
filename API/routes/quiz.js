@@ -51,6 +51,7 @@ router.get("/all-quiz", async (req, res) => {
 router.post("/set-attempted", async (req, res) => {
   try {
     const { uid, quizID, score } = req.body;
+    console.log(req.body);
     const data = await quizService.SetAttempted({ uid, quizID, score });
   } catch (e) {
     console.log("Error while handling GetAllQuiz request:", e);

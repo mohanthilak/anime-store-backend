@@ -3,24 +3,27 @@ const router = express.Router();
 const { UserService } = require("../../services/users");
 const { QuizService } = require("../../services/quiz");
 const { ProductService } = require("../../services/product");
+const { FeedbackService } = require("../../services/feedback");
 
 const { UserRepository } = require("../../database/Repository/users");
 const { ProductRepository } = require("../../database/Repository/product");
 const { QuizRepository } = require("../../database/Repository/quiz");
+const { FeedbackRepository } = require("../../database/Repository/feedback");
 
 const userRepo = new UserRepository();
 const quizRepo = new QuizRepository();
 const productRepo = new ProductRepository();
+const feedbackRepo = new FeedbackRepository();
 
 const quizService = new QuizService(quizRepo, userRepo);
 const productService = new ProductService(productRepo);
 const userservice = new UserService(userRepo);
+const feedbackService = new FeedbackService(feedbackRepo);
 const { auth } = require("../middlewares/auth");
-const { trusted } = require("mongoose");
 
 router.post("/signup", async (req, res) => {
   try {
-    const { email, password, username } = req.body;
+    const { email, password, username = "defalut" } = req.body;
     const data = await userservice.SignUp({ email, password, username });
     console.log("DATA:", data);
     if (data.success) {
@@ -41,9 +44,9 @@ router.post("/signup", async (req, res) => {
 
 router.post("/signin", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { authText, password } = req.body;
     console.log(req.body);
-    const data = await userservice.SignIn({ email, password });
+    const data = await userservice.SignIn({ authText, password });
     if (data.success) {
       res.cookie("rt", data.refreshToken, {
         httpOnly: true,
@@ -79,9 +82,13 @@ router.get("/refresh-token/:uid", async (req, res) => {
 
 router.post("/logout/:uid", async (req, res) => {
   try {
-    const { refreshToken, accessToken } = req.body;
+    // const { refreshToken, accessToken } = req.body;
+    const cookies = req.cookies;
+    if (!cookies?.rt) return res.sendStatus(403);
+    const refreshToken = cookies.rt;
     const { uid } = req.params;
     const data = await userservice.HandleUserLogout(uid, refreshToken);
+    res.clearCookie("rt");
     return res.status(200).json(data);
   } catch (e) {
     console.log("Error while handling logout request", e);
@@ -120,12 +127,15 @@ router.get("/get-count-stats", async (req, res) => {
     const qData = await quizService.GetQuizCount();
     const pData = await productService.GetProductsCount();
     const uData = await userservice.GetUsersCount();
+    const fData = await feedbackService.GetFeedbacksCount();
+
     const response = {
       success: true,
     };
     if (qData.success) response.q = qData.count;
     if (pData.success) response.p = pData.count;
     if (uData.success) response.u = uData.count;
+    if (fData.success) response.f = fData.count;
     return res.status(200).json(response);
   } catch (e) {
     console.log("Error while handling count stats", e);
@@ -141,6 +151,18 @@ router.get("/quiz-performance", async (req, res) => {
   } catch (e) {
     console.log("Error while handling quiz-performance stats", e);
     return res.status(401).json({ success: false, error: e });
+  }
+});
+
+router.get("/all-users", async (req, res) => {
+  try {
+    const data = await userservice.GetAllUsers();
+    if (data) return res.status(200).json(data);
+    return res.status(201).json(data);
+  } catch (e) {
+    const data = await userservice.GetAllUsers();
+    if (data) return res.status(200).json(data);
+    return res.status(201).json(data);
   }
 });
 module.exports = router;

@@ -23,7 +23,12 @@ class UserService {
 
       if (data.success) {
         const user = data.user;
-        const payload = { email, role: data.role, uid: data.data._id };
+        const payload = {
+          email,
+          username,
+          role: data.role,
+          uid: data.data._id,
+        };
         const accessToken = await sign(payload, ACCESS_TOKEN_SECRET, {
           expiresIn: "15s",
         });
@@ -45,15 +50,23 @@ class UserService {
     }
   }
 
-  async SignIn({ email, password }) {
+  async SignIn({ authText, password }) {
     try {
-      const data = await this.userRepo.GetUserWithEmail(email);
+      let data;
+      if (authText.includes("@"))
+        data = await this.userRepo.GetUserWithEmail(authText);
+      else data = await this.userRepo.GetUserWithUsername(authText);
       console.log(data);
       if (!data.success) return data;
       const validPassword = await compare(password, data.user.password);
       if (!validPassword)
         return { success: false, message: "Enter the correct email/password" };
-      const payload = { email, role: data.user.role, uid: data.user._id };
+      const payload = {
+        email: data.user.email,
+        username: data.user.username,
+        role: data.user.role,
+        uid: data.user._id,
+      };
       const accessToken = await sign(payload, ACCESS_TOKEN_SECRET, {
         expiresIn: "15s",
       });
@@ -119,6 +132,16 @@ class UserService {
   async GetUsersCount() {
     try {
       const data = await this.userRepo.GetUsersCount();
+      return data;
+    } catch (e) {
+      console.log("Error while getting user count", e);
+      return { success: false, error: e };
+    }
+  }
+
+  async GetAllUsers() {
+    try {
+      const data = await this.userRepo.GetAllUsers();
       return data;
     } catch (e) {
       console.log("Error while getting user count", e);
