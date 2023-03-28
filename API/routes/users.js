@@ -101,7 +101,6 @@ router.post("/refresh", async (req, res) => {
   try {
     // const {refreshToken} = req.body;
     const cookies = req.cookies;
-    console.log("reached", cookies);
     if (!cookies?.rt) return res.sendStatus(403);
     const refreshToken = cookies.rt;
     const data = await userservice.RefreshAccessToken(refreshToken);
@@ -150,6 +149,19 @@ router.get("/quiz-performance", async (req, res) => {
     return res.status(201).json(data);
   } catch (e) {
     console.log("Error while handling quiz-performance stats", e);
+    return res.status(401).json({ success: false, error: e });
+  }
+});
+
+router.get("/search-users/:text", async (req, res) => {
+  try {
+    const { text } = req.params;
+    console.log(text);
+    const data = await userservice.GetUserBasedOnInputText({ text });
+    if (data.success) return res.status(200).json(data);
+    return res.status(201).json(data);
+  } catch (e) {
+    console.log("Error while handling search-users based on input text", e);
     return res.status(401).json({ success: false, error: e });
   }
 });

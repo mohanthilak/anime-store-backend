@@ -39,6 +39,9 @@ const userSchema = new Schema({
     default: "user",
     enum: ["user", "admin"],
   },
+  socketId: {
+    type: String,
+  },
 });
 
 module.exports = model("user", userSchema);

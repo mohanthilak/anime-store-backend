@@ -149,6 +149,16 @@ class UserService {
     }
   }
 
+  async GetUserBasedOnInputText({ text }) {
+    try {
+      const data = await this.userRepo.GetUserBasedOnInputText({ text });
+      return data;
+    } catch (e) {
+      console.log("Error at User Service Layer", e);
+      return { success: false, error: e };
+    }
+  }
+
   async GetAllUsersPerformace() {
     try {
       const data = await this.userRepo.GetAllUsersPerformace();

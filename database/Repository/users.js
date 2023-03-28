@@ -106,6 +106,18 @@ class UserRepository {
     }
   }
 
+  async GetUserBasedOnInputText({ text }) {
+    try {
+      const data = await userModel.find({
+        username: { $regex: text, $options: "i" },
+      });
+      return { success: true, data };
+    } catch (e) {
+      console.log("Error at user Repository Layer", e);
+      return { success: false, error: e };
+    }
+  }
+
   async GetRefreshTokenWithUID(uid) {
     try {
       const refreshToken = await refreshTokenModel.findOne({ user_id: uid });
@@ -190,6 +202,22 @@ class UserRepository {
       return { success: true, count };
     } catch (e) {
       console.log("Error while getting total user count", e);
+      return { success: false, error: e };
+    }
+  }
+
+  async AddSocketId({ uid, socketId }) {
+    try {
+      const user = await userModel.findById(uid).select("-password");
+      if (user) {
+        user.socketId = socketId;
+        user.save();
+        return { success: true, data: user };
+      } else {
+        return { success: false, error: "User not found" };
+      }
+    } catch (e) {
+      console.log("Error in user Repository Layer", e);
       return { success: false, error: e };
     }
   }

@@ -7,10 +7,20 @@ const { QuizService } = require("../../services/quiz");
 const quizRepo = new QuizRepository();
 const userRepo = new UserRepository();
 const quizService = new QuizService(quizRepo, userRepo);
+const multer = require("multer");
+const { storage, cloudinary } = require("../../config/cloudinary");
+const upload = multer({ storage: storage });
 
-router.post("/create", async (req, res) => {
+router.post("/create", upload.single("image"), async (req, res) => {
   try {
-    const { animeName, season, image, questions } = req.body;
+    const { animeName, season } = req.body;
+    let questions = [];
+    for (let key in req.body) {
+      if (key.includes("question")) {
+        questions.push(req.body[key]);
+      }
+    }
+    const image = req.file.path;
     const data = await quizService.CreateQuiz({
       animeName,
       season,
