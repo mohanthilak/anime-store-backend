@@ -6,7 +6,17 @@ const chatRepo = new ChatRepo();
 class ChatService {
   async GetChat({ users }) {
     try {
-      const data = chatRepo.GetChat({ users });
+      const data = await chatRepo.GetChat({ users });
+      return data;
+    } catch (e) {
+      console.log("Error At Chat Service Layer", e);
+      return { success: false, error: e };
+    }
+  }
+
+  async GetUserChats({ uid }) {
+    try {
+      const data = await chatRepo.GetUserChats({ uid });
       return data;
     } catch (e) {
       console.log("Error At Chat Service Layer", e);
@@ -50,6 +60,14 @@ const ChatServiceFunc = async (io) => {
           });
           if (newChatRoomData.success) {
             socket.emit("message-send-status", { messageSent: true, message });
+            const checkReceiverHasSocketId = await userRepo.checkSocketId({
+              uid: message.to,
+            });
+            if (checkReceiverHasSocketId.success) {
+              socket
+                .to(checkReceiverHasSocketId.data)
+                .emit("message-received", message);
+            }
           } else {
             socket.emit("message-send-status", { messageSent: false });
           }
@@ -60,6 +78,14 @@ const ChatServiceFunc = async (io) => {
           });
           if (newChatRoomData.success) {
             socket.emit("message-send-status", { messageSent: true, message });
+            const checkReceiverHasSocketId = await userRepo.checkSocketId({
+              uid: message.to,
+            });
+            if (checkReceiverHasSocketId.success) {
+              socket
+                .to(checkReceiverHasSocketId.data)
+                .emit("message-received", message);
+            }
           } else {
             socket.emit("message-send-status", { messageSent: false });
           }
@@ -67,8 +93,13 @@ const ChatServiceFunc = async (io) => {
       }
     });
 
-    socket.on("disconnect", () => {
-      console.log("user disconnected");
+    socket.on("disconnect", async () => {
+      try {
+        const data = await userRepo.deleteSocketId({ socketId: socket.id });
+        console.log(`user Disconnected:[${socket.id}]`, data);
+      } catch (e) {
+        console.log("Error at Chat Service layer", e);
+      }
     });
   });
 };

@@ -16,4 +16,16 @@ router.post("/get-chat", async (req, res) => {
   }
 });
 
+router.get("/get-user-chat/:uid", async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const data = await chatService.GetUserChats({ uid });
+    if (data.success) return res.status(200).json(data);
+    return res.status(201).json(data);
+  } catch (e) {
+    console.log("Error while handling get user chats", e);
+    return res.status(401).json({ success: false, error: e });
+  }
+});
+
 module.exports = router;

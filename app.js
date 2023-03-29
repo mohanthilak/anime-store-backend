@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5174", "http://localhost:5173"],
   },
   withCredentials: true,
 });

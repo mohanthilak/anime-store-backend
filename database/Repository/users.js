@@ -221,6 +221,30 @@ class UserRepository {
       return { success: false, error: e };
     }
   }
+  async checkSocketId({ uid }) {
+    try {
+      const user = await userModel.findById(uid);
+      if (user && user.socketId) {
+        return { success: true, data: socketId };
+      }
+      return { success: false, data: null };
+    } catch (e) {
+      console.log("Error at user Repository Layer", e);
+      return { success: false, error: e };
+    }
+  }
+  async deleteSocketId({ socketId }) {
+    try {
+      const user = await userModel.findOneAndUpdate(
+        { socketId },
+        { socketId: "" }
+      );
+      return { success: true, data: user };
+    } catch (e) {
+      console.log("Error in user Repository Layer", e);
+      return { success: false, error: e };
+    }
+  }
 }
 
 module.exports = { UserRepository };
