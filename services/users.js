@@ -168,6 +168,26 @@ class UserService {
       return { success: false, error: e };
     }
   }
+
+  async EditUserRole({uid, role}) {
+    try{
+      const data = await this.userRepo.editUserRole({uid, role});
+      return data;
+    }catch(e) {
+      console.log("Error while editUserRole", e);
+      return { success: false, error: e };
+    }
+  }
+
+  async DeleteUser({uid}) {
+    try{
+      const data = await this.userRepo.DeleteUser({uid});
+      return data;
+    }catch(e) {
+      console.log("Error while deleteUser", e);
+      return { success: false, error: e };
+    }
+  }
 }
 
 module.exports = { UserService };

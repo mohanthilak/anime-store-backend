@@ -48,6 +48,7 @@ router.post("/add-product", async (req, res) => {
 router.post("/remove-product", async (req, res) => {
   try {
     const { cartId, productId } = req.body;
+    console.log(req.body)
     const data = await cartService.removeProductFromCart(cartId, productId);
     if (data.success) return res.status(200).json(data);
     return res.status(201).json(data);

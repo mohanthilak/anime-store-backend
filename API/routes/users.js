@@ -172,9 +172,32 @@ router.get("/all-users", async (req, res) => {
     if (data) return res.status(200).json(data);
     return res.status(201).json(data);
   } catch (e) {
-    const data = await userservice.GetAllUsers();
-    if (data) return res.status(200).json(data);
-    return res.status(201).json(data);
+    console.log("Error while handling Get all users", e);
+    return res.status(401).json({ success: false, error: e });
   }
 });
+
+router.post("/edit-role", async(req, res) => {
+  try {
+    const {uid, role} = req.body;
+    console.log(req.body)
+    const data = await userservice.EditUserRole({uid, role})
+    return res.status(200).json(data)
+  }catch(e){
+    console.log("Error while handling edit role", e);
+    return res.status(401).json({ success: false, error: e });
+  }
+})
+
+router.delete("/delete/:uid", async (req, res) =>{
+  try{
+    const {uid} = req.params;
+    const data = await userservice.DeleteUser({uid})
+    return res.status(200).json(data)
+  }catch(e){
+    console.log("Error while handling deleteuser", e);
+    return res.status(401).json({ success: false, error: e });
+  }
+})
+
 module.exports = router;

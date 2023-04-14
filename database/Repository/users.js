@@ -245,6 +245,26 @@ class UserRepository {
       return { success: false, error: e };
     }
   }
+
+  async editUserRole({uid, role}) {
+    try{
+      const user = await userModel.findByIdAndUpdate(uid, {role})
+      return {success: true, data: user}
+    }catch(e){
+      console.log("Error in user Repository Layer", e);
+      return { success: false, error: e };
+    }
+  }
+
+  async DeleteUser({uid}) {
+    try{
+      const user = await userModel.findByIdAndDelete(uid);
+      return {success: true, data: user}
+    }catch(e){
+      console.log("Error in user Repository Layer", e);
+      return { success: false, error: e };
+    }
+  }
 }
 
 module.exports = { UserRepository };
