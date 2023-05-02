@@ -10,15 +10,15 @@ const { CartService } = require("../../services/cart");
 const cartService = new CartService(cartRepo);
 
 const orderRepository = new OrderRepository();
-const orderService = new OrderService(orderRepository);
+const orderService = new OrderService(orderRepository, cartRepo);
 
 router.post("/create", async (req, res) => {
   try {
     const {
       custId,
       paymentType,
-      paymentId = "1122",
-      addressId = "1232asd",
+      paymentId = "deafult",
+      addressId = "default",
     } = req.body;
     const cart = await cartService.GetUsersCurrentCart(custId);
     const cartId = cart.data._id.toString();

@@ -2,8 +2,10 @@ const ErrorMessage = "Error at Order Service Layer";
 
 class OrderService {
   orderRepo;
-  constructor(repo) {
-    this.orderRepo = repo;
+  cartRepo;
+  constructor(orderRepo, cartRepo) {
+    this.orderRepo = orderRepo;
+    this.cartRepo = cartRepo
   }
 
   async CreateOrder({
@@ -23,6 +25,9 @@ class OrderService {
         paymentId,
         addressId,
       });
+      
+      if(data.sucess) await this.cartRepo.ChangeCurrentCartToFalse(custId);
+      
       return data;
     } catch (e) {
       console.log(ErrorMessage, e);
